@@ -1,0 +1,33 @@
+package:
+  name: giacenza-browser
+  dependencies:
+    - prelude
+    - effect
+    - aff
+    - console
+    - halogen
+    - arrays
+    - maybe
+    - either
+    - ordered-collections
+    - strings
+    - integers
+    - numbers
+    - web-file
+    - web-html
+    - web-dom
+    - web-events
+    - foldable-traversable
+    - tuples
+    - refs
+    - transformers
+    - aff-promise
+  bundle:
+    module: Main
+    outfile: dist/index.js
+    platform: browser
+    type: app
+
+workspace:
+  packageSet:
+    registry: 72.1.0

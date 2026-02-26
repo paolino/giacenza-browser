@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Giacenza Media Calculator</title>
+  <style>
+    :root {
+      --bg: #1a1a2e;
+      --bg-card: #16213e;
+      --text: #e0e0e0;
+      --text-muted: #8892a4;
+      --accent: #0f3460;
+      --accent-hover: #1a4a80;
+      --primary: #e94560;
+      --primary-hover: #f05a73;
+      --border: #2a3a5c;
+      --success: #4caf50;
+      --error: #f44336;
+      --warning: #ff9800;
+      --number: #64b5f6;
+    }
+
+    body.light-theme {
+      --bg: #f5f5f5;
+      --bg-card: #ffffff;
+      --text: #333333;
+      --text-muted: #666666;
+      --accent: #e3e8f0;
+      --accent-hover: #d0d8e8;
+      --primary: #e94560;
+      --primary-hover: #d03050;
+      --border: #ddd;
+      --success: #2e7d32;
+      --error: #c62828;
+      --warning: #e65100;
+      --number: #1565c0;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    .app { min-height: 100vh; display: flex; flex-direction: column; }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header h1 { font-size: 1.5rem; font-weight: 600; }
+
+    .theme-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.4rem 0.8rem;
+      cursor: pointer;
+      font-size: 1.2rem;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+      flex: 1;
+      width: 100%;
+    }
+
+    /* Upload */
+    .upload-area { margin-bottom: 2rem; }
+    .upload-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: border-color 0.2s;
+      color: var(--text-muted);
+      font-size: 1.1rem;
+    }
+    .upload-label:hover { border-color: var(--primary); color: var(--text); }
+    .upload-input { display: none; }
+
+    /* File cards */
+    .file-list { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem; }
+    .file-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .file-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .file-name { font-weight: 600; flex: 1; }
+
+    /* Badges */
+    .badge {
+      font-size: 0.75rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 99px;
+      font-weight: 500;
+    }
+    .badge-pending { background: var(--warning); color: #000; }
+    .badge-config { background: var(--accent); color: var(--text); }
+    .badge-success { background: var(--success); color: #fff; }
+    .badge-error { background: var(--error); color: #fff; }
+
+    /* Config form */
+    .config-form { padding: 1rem; }
+    .form-group { margin-bottom: 0.75rem; }
+    .form-group label { display: block; margin-bottom: 0.25rem; font-size: 0.9rem; color: var(--text-muted); }
+    .form-control {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 0.95rem;
+    }
+    .radio-group { display: flex; gap: 1.5rem; }
+    .radio-group label { display: flex; align-items: center; gap: 0.3rem; cursor: pointer; color: var(--text); }
+
+    /* Config summary */
+    .config-summary {
+      padding: 0.75rem 1rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: background 0.2s;
+      margin-right: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-secondary { background: var(--accent); color: var(--text); }
+    .btn-secondary:hover { background: var(--accent-hover); }
+    .btn-danger { background: transparent; color: var(--error); border: 1px solid var(--error); }
+    .btn-danger:hover { background: var(--error); color: #fff; }
+    .btn-sm { padding: 0.25rem 0.6rem; font-size: 0.8rem; }
+
+    /* Result table */
+    .result-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.75rem 0;
+    }
+    .result-table th, .result-table td {
+      padding: 0.5rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .result-table th { color: var(--text-muted); font-weight: 500; font-size: 0.85rem; }
+    .result-table .number { text-align: right; color: var(--number); font-variant-numeric: tabular-nums; }
+
+    /* Aggregated */
+    .aggregated {
+      margin-top: 2rem;
+      padding: 1rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+    .aggregated h2 { font-size: 1.1rem; margin-bottom: 0.5rem; }
+
+    /* Error */
+    .error { color: var(--error); padding: 0.75rem 1rem; font-size: 0.9rem; }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 1.5rem;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 640px) {
+      .header { padding: 0.75rem 1rem; }
+      .header h1 { font-size: 1.2rem; }
+      .container { padding: 1rem 0.5rem; }
+      .radio-group { flex-direction: column; gap: 0.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <script src="index.js"></script>
+</body>
+</html>
